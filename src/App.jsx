@@ -28,7 +28,7 @@ function App() {
     }));
   };
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
     const selectedCuisines = Object.keys(cuisines).filter(cuisine => cuisines[cuisine]);
     const selectedAllergies = Object.keys(allergies).filter(allergy => allergies[allergy]);
     
@@ -37,7 +37,24 @@ function App() {
       allergies: selectedAllergies
     };
     
+    // Save to localStorage
     localStorage.setItem('userProfile', JSON.stringify(profile));
+    
+    // Make POST request to server
+    try {
+      const response = await fetch('http://localhost:3001/api/generatePacks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profile),
+      });
+      
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    }
   };
 
   const styles = {
