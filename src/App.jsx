@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import RecipeCard from './RecipeCard.jsx';
+import ShoppingListComponent from './ShoppingListComponent.jsx';
 
 function App() {
   const [cuisines, setCuisines] = useState({
@@ -13,6 +15,9 @@ function App() {
     Gluten: false,
     Nuts: false,
   });
+
+  const [mealPack, setMealPack] = useState(null);
+  const [showShoppingList, setShowShoppingList] = useState(false);
 
   const handleCuisineChange = (cuisine) => {
     setCuisines(prev => ({
@@ -51,7 +56,8 @@ function App() {
       });
       
       const data = await response.json();
-      console.log(data);
+      setMealPack(data); // <-- This is the new line
+      console.log(data); // We can keep this for debugging
     } catch (error) {
       console.error('Error saving profile:', error);
     }
@@ -132,66 +138,85 @@ function App() {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>Your Meal Profile</h1>
-      
-      <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>Cuisine Preferences</h2>
-        <div style={styles.checkboxGroup}>
-          {Object.keys(cuisines).map(cuisine => (
-            <label
-              key={cuisine}
-              style={styles.checkboxLabel}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = styles.checkboxLabelHover.backgroundColor}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            >
-              <input
-                type="checkbox"
-                checked={cuisines[cuisine]}
-                onChange={() => handleCuisineChange(cuisine)}
-                style={styles.checkbox}
-              />
-              {cuisine}
-            </label>
-          ))}
-        </div>
-      </div>
+      {mealPack === null ? (
+        <div>
+          <h1 style={styles.title}>Your Meal Profile</h1>
+          
+          <div style={styles.section}>
+            <h2 style={styles.sectionTitle}>Cuisine Preferences</h2>
+            <div style={styles.checkboxGroup}>
+              {Object.keys(cuisines).map(cuisine => (
+                <label
+                  key={cuisine}
+                  style={styles.checkboxLabel}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = styles.checkboxLabelHover.backgroundColor}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <input
+                    type="checkbox"
+                    checked={cuisines[cuisine]}
+                    onChange={() => handleCuisineChange(cuisine)}
+                    style={styles.checkbox}
+                  />
+                  {cuisine}
+                </label>
+              ))}
+            </div>
+          </div>
 
-      <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>Allergies</h2>
-        <div style={styles.checkboxGroup}>
-          {Object.keys(allergies).map(allergy => (
-            <label
-              key={allergy}
-              style={styles.checkboxLabel}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = styles.checkboxLabelHover.backgroundColor}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            >
-              <input
-                type="checkbox"
-                checked={allergies[allergy]}
-                onChange={() => handleAllergyChange(allergy)}
-                style={styles.checkbox}
-              />
-              {allergy}
-            </label>
-          ))}
-        </div>
-      </div>
+          <div style={styles.section}>
+            <h2 style={styles.sectionTitle}>Allergies</h2>
+            <div style={styles.checkboxGroup}>
+              {Object.keys(allergies).map(allergy => (
+                <label
+                  key={allergy}
+                  style={styles.checkboxLabel}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = styles.checkboxLabelHover.backgroundColor}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <input
+                    type="checkbox"
+                    checked={allergies[allergy]}
+                    onChange={() => handleAllergyChange(allergy)}
+                    style={styles.checkbox}
+                  />
+                  {allergy}
+                </label>
+              ))}
+            </div>
+          </div>
 
-      <button
-        style={styles.button}
-        onClick={handleSaveProfile}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = styles.buttonHover.backgroundColor;
-          e.currentTarget.style.transform = styles.buttonHover.transform;
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = styles.button.backgroundColor;
-          e.currentTarget.style.transform = 'none';
-        }}
-      >
-        Save Profile
-      </button>
+          <button
+            style={styles.button}
+            onClick={handleSaveProfile}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = styles.buttonHover.backgroundColor;
+              e.currentTarget.style.transform = styles.buttonHover.transform;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = styles.button.backgroundColor;
+              e.currentTarget.style.transform = 'none';
+            }}
+          >
+            Save Profile
+          </button>
+        </div>
+      ) : (
+        <div>
+          <h1 style={styles.title}>Your Meal Pack</h1>
+          <button onClick={() => setShowShoppingList(true)} style={styles.button}>Get Shopping List</button>
+          
+          {showShoppingList ? (
+            <ShoppingListComponent recipes={mealPack} />
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+              {mealPack.map(recipe => (
+                <RecipeCard key={recipe.recipeId} recipe={recipe} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
