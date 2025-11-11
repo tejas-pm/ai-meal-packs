@@ -28,5 +28,5 @@ function transformRecipe(apiRecipe) {
   };
 }
 
-module.exports = { transformRecipe };
+export { transformRecipe };
 
