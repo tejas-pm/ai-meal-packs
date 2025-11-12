@@ -8,6 +8,12 @@ function App() {
     Italian: false,
     Thai: false,
     Mexican: false,
+    Japanese: false,
+    Greek: false,
+    Spanish: false,
+    American: false,
+    Vietnamese: false,
+    French: false,
   });
 
   const [allergies, setAllergies] = useState({
